@@ -29,6 +29,124 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Auth Modal Logic
+    const authModal = document.getElementById('authModal');
+    const loginTab = document.getElementById('loginTab');
+    const signupTab = document.getElementById('signupTab');
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const loginError = document.getElementById('loginError');
+    const signupError = document.getElementById('signupError');
+
+    // Auth modal only shown when needed
+    let isAuthenticated = false;
+    const signupModal = document.getElementById('signupModal');
+    const signupForm = document.getElementById('signupForm');
+    const signupError = document.getElementById('signupError');
+    function showAuthModal() {
+        authModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    function hideAuthModal() {
+        authModal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+    function showSignupModal() {
+        signupModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    function hideSignupModal() {
+        signupModal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    window.openSignupModal = function() {
+        showSignupModal();
+    }
+
+    // Remove showAuthTab logic (no tabs)
+
+    // Dummy authentication (replace with real API calls)
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        // Basic validation
+        if (!email || !password) {
+            loginError.textContent = 'Please enter email and password.';
+            return;
+        }
+        // Simulate login success (replace with AJAX to backend)
+        if (email === 'test@example.com' && password === 'password123') {
+            isAuthenticated = true;
+            hideAuthModal();
+        } else {
+            loginError.textContent = 'Invalid credentials.';
+        }
+    });
+
+    if (signupForm) {
+        signupForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const phone = document.getElementById('signupPhone').value.trim();
+            const state = document.getElementById('signupState').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            // Basic validation
+            if (!name || !email || !phone || !state || !password) {
+                signupError.textContent = 'All fields are required.';
+                return;
+            }
+            // Simulate signup success (replace with AJAX to backend)
+            isAuthenticated = true;
+            hideSignupModal();
+        });
+    }
+
+    // Only show login modal when accessing protected sections
+    function requireAuthForSection(sectionId) {
+        if (!isAuthenticated) {
+            showAuthModal();
+            return false;
+        }
+        return true;
+    }
+
+    // Legal Cases, Business Licenses, FAQ, Contact, Chatbot
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            const href = link.getAttribute('href');
+            if (["#legal-cases","#business-licenses","#faq","#contact"].includes(href)) {
+                if (!requireAuthForSection(href.substring(1))) {
+                    e.preventDefault();
+                }
+            }
+        });
+    });
+
+    // Protect chatbot usage
+    const chatbotInput = document.getElementById('chatbotInput');
+    if (chatbotInput) {
+        chatbotInput.addEventListener('focus', function(e) {
+            if (!requireAuthForSection('chatbot')) {
+                e.preventDefault();
+                chatbotInput.blur();
+            }
+        });
+    }
+
+    // Protect AI Legal Assistant usage
+    const legalQueryInput = document.getElementById('legalQuery');
+    if (legalQueryInput) {
+        legalQueryInput.addEventListener('focus', function(e) {
+            if (!requireAuthForSection('ai-assistant')) {
+                e.preventDefault();
+                legalQueryInput.blur();
+            }
+        });
+    }
 });
 
 // Scroll to section function
